@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cálculo de Tempo de Trabalho</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .resultado.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resultado h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .metric-value {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .status.dentro {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status.excede {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #0c5460;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Cálculo de Tempo de Trabalho</h1>
+        <p class="subtitle">Versão Web - Projeto 2 Refatorado</p>
+
+        <div class="info-box">
+            ℹ️ Jornada padrão: <strong>8h 30m (510 minutos)</strong>
+        </div>
+        
+        <div class="form-group">
+            <label for="tipo1">Processos Tipo 1 (5.91 min cada)</label>
+            <input type="number" id="tipo1" min="0" value="8">
+        </div>
+
+        <div class="form-group">
+            <label for="tipo2">Processos Tipo 2 (7.59 min cada)</label>
+            <input type="number" id="tipo2" min="0" value="10">
+        </div>
+
+        <div class="form-group">
+            <label for="tipo3">Processos Tipo 3 (0.85 min cada)</label>
+            <input type="number" id="tipo3" min="0" value="45">
+        </div>
+
+        <button onclick="calcular()">Calcular ⚡</button>
+
+        <div class="error" id="erro"></div>
+
+        <div class="resultado" id="resultado">
+            <h2>⏱️ Resultado Final</h2>
+            
+            <div class="metric">
+                <span class="metric-label">Tempo Total:</span>
+                <span class="metric-value" id="tempoTotal">-</span>
+            </div>
+
+            <div class="metric">
+                <span class="metric-label">Em Minutos:</span>
+                <span class="metric-value" id="tempoMinutos">-</span>
+            </div>
+
+            <div class="section-title">📋 Detalhamento por Tipo</div>
+
+            <div class="metric">
+                <span class="metric-label">Tipo 1 (5.91 min × quantidade):</span>
+                <span class="metric-value" id="tempoTipo1">-</span>
+            </div>
+
+            <div class="metric">
+                <span class="metric-label">Tipo 2 (7.59 min × quantidade):</span>
+                <span class="metric-value" id="tempoTipo2">-</span>
+            </div>
+
+            <div class="metric">
+                <span class="metric-label">Tipo 3 (0.85 min × quantidade):</span>
+                <span class="metric-value" id="tempoTipo3">-</span>
+            </div>
+
+            <div class="status" id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        const PROCESS_DURATIONS = {
+            tipo_1: 5.91,
+            tipo_2: 7.59,
+            tipo_3: 0.85
+        };
+
+        const WORK_DAY_MINUTES = 510;
+
+        function calcular() {
+            const tipo1 = parseInt(document.getElementById('tipo1').value) || 0;
+            const tipo2 = parseInt(document.getElementById('tipo2').value) || 0;
+            const tipo3 = parseInt(document.getElementById('tipo3').value) || 0;
+
+            const erroDiv = document.getElementById('erro');
+
+            if (tipo1 < 0 || tipo2 < 0 || tipo3 < 0) {
+                erroDiv.textContent = '❌ O número de processos não pode ser negativo!';
+                erroDiv.classList.add('show');
+                document.getElementById('resultado').classList.remove('show');
+                return;
+            }
+
+            if (tipo1 === 0 && tipo2 === 0 && tipo3 === 0) {
+                erroDiv.textContent = '❌ Pelo menos um tipo de processo deve ser informado!';
+                erroDiv.classList.add('show');
+                document.getElementById('resultado').classList.remove('show');
+                return;
+            }
+
+            erroDiv.classList.remove('show');
+
+            const tempoTipo1 = tipo1 * PROCESS_DURATIONS.tipo_1;
+            const tempoTipo2 = tipo2 * PROCESS_DURATIONS.tipo_2;
+            const tempoTipo3 = tipo3 * PROCESS_DURATIONS.tipo_3;
+            const tempoTotal = tempoTipo1 + tempoTipo2 + tempoTipo3;
+
+            const horas = Math.floor(tempoTotal / 60);
+            const minutos = Math.floor(tempoTotal % 60);
+            const segundos = Math.floor((tempoTotal % 1) * 60);
+
+            document.getElementById('tempoTotal').textContent = `${horas}h ${minutos}m ${segundos}s`;
+            document.getElementById('tempoMinutos').textContent = `${tempoTotal.toFixed(2)} min`;
+            document.getElementById('tempoTipo1').textContent = `${tempoTipo1.toFixed(2)} min`;
+            document.getElementById('tempoTipo2').textContent = `${tempoTipo2.toFixed(2)} min`;
+            document.getElementById('tempoTipo3').textContent = `${tempoTipo3.toFixed(2)} min`;
+
+            const statusDiv = document.getElementById('status');
+            const diferenca = WORK_DAY_MINUTES - tempoTotal;
+
+            if (tempoTotal <= WORK_DAY_MINUTES) {
+                const minRest = Math.floor(diferenca);
+                const segRest = Math.floor((diferenca % 1) * 60);
+                statusDiv.innerHTML = `<div>✅ DENTRO DA JORNADA</div><div>Tempo restante: <strong>${minRest}m ${segRest}s</strong></div>`;
+                statusDiv.className = 'status dentro';
+            } else {
+                const excesso = Math.abs(diferenca);
+                const minExc = Math.floor(excesso);
+                const segExc = Math.floor((excesso % 1) * 60);
+                statusDiv.innerHTML = `<div>⚠️ EXCEDE A JORNADA</div><div>Tempo em excesso: <strong>${minExc}m ${segExc}s</strong></div>`;
+                statusDiv.className = 'status excede';
+            }
+
+            document.getElementById('resultado').classList.add('show');
+        }
+
+        // Permitir calcular com Enter
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') calcular();
+        });
+
+        // Calcular automaticamente ao carregar
+        window.addEventListener('load', () => {
+            calcular();
+        });
+    </script>
+</body>
+</html>
