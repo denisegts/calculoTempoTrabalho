@@ -49,7 +49,7 @@ def limpar():
 # ============================================
 # INTERFACE
 # ============================================
-st.title("⏱️ Calculadora de Jornada - Projeto 2")
+st.title("⏱️ Calculadora de Jornada")
 
 tab1, tab2, tab3 = st.tabs(["🔢 Calculadora de Processos", "📝 Registro Avulso", "⚙️ Configurações"])
 
